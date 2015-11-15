@@ -21,6 +21,28 @@ summary(data)
 
 ## What is mean total number of steps taken per day?
 
+```r
+stepsByDay <-  aggregate(data$steps, by=list(data$date),FUN=sum)
+hist(stepsByDay$x)
+```
+
+![](PA1_template_files/figure-html/mean_values-1.png) 
+
+```r
+mean(na.omit(stepsByDay$x))
+```
+
+```
+## [1] 10766.19
+```
+
+```r
+median(na.omit(stepsByDay$x))
+```
+
+```
+## [1] 10765
+```
 
 
 ## What is the average daily activity pattern?
