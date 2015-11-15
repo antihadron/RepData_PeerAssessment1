@@ -33,6 +33,8 @@ maxTime <- subset(stepsByInterval, stepsByInterval$x==max(stepsByInterval$x))
 format(strptime(formatC(maxTime$Group.1,width=4,format="d", flag="0"),'%H%M'),'%H:%M')
 ```
 ## Imputing missing values
+The strategy to impute missing values is to extract the average value for the specific interval using a function to compute the lookup.
+
 ``` {r imputed_values}
 getMean <- function(tst) {
   tst2=tst[3]
