@@ -2,6 +2,7 @@
 
 
 ## Loading and preprocessing the data
+The activity.csv was created by extracting the contents of the zip file.  It was read simply by read.csv() and a summary statistics are displayed
 
 ```r
 data = read.csv('activity.csv')
@@ -23,7 +24,7 @@ summary(data)
 
 ```r
 stepsByDay <-  aggregate(data$steps, by=list(data$date),FUN=sum,na.rm=TRUE)
-hist(stepsByDay$x)
+hist(stepsByDay$x,main="Histogram of total steps per day",  xlab="number of steps per day")
 ```
 
 ![](PA1_template_files/figure-html/mean_values-1.png) 
@@ -50,7 +51,7 @@ median(stepsByDay$x)
 ```r
 stepsByInterval <-  aggregate(data$steps, by=list(data$interval),FUN=mean,na.rm=TRUE)
 times<-strptime(formatC(stepsByInterval$Group.1,width=4,format="d", flag="0"),'%H%M')
-plot(times,stepsByInterval$x, type='l')
+plot(times,stepsByInterval$x, type='l', main="Daily activity pattern",  ylab="number of steps per interval", xlab="Time of day")
 ```
 
 ![](PA1_template_files/figure-html/average_daily-1.png) 
@@ -77,7 +78,7 @@ imputed$imputedSteps <- imputedValues
 imputed <- transform(imputed,steps=ifelse(is.na(steps),imputedSteps,steps))
 
 stepsByDayImputed <-  aggregate(imputed$steps, by=list(imputed$date),FUN=sum,na.rm=TRUE)
-hist(stepsByDayImputed$x)
+hist(stepsByDayImputed$x,main="Histogram with missing values imputed",  xlab="number of steps per day")
 ```
 
 ![](PA1_template_files/figure-html/imputed_values-1.png) 
@@ -97,11 +98,11 @@ median(stepsByDayImputed$x)
 ```
 ## [1] 10766.19
 ```
-
+The effect imputing the values is to push the distribution of the number of steps to a more normal distribution
 ## Are there differences in activity patterns between weekdays and weekends?
 
 ```r
-imputed$weekend <- chron::is.weekend(imputed$date)
+imputed$weekend <- factor(chron::is.weekend(imputed$date),labels=c("weekday","weekend"))
 groupSteps <- aggregate(imputed$steps, by =list(interval=imputed$interval,weekend=imputed$weekend),FUN=mean)
 library(ggplot2)
 ```
@@ -112,7 +113,11 @@ library(ggplot2)
 
 ```r
 g <- ggplot(groupSteps, aes(interval, x))
-g + geom_line() + facet_grid(weekend ~ .)
+g + geom_line() + facet_grid(weekend ~ .) +
+labs(title="Daily activity pattern by weekday type") +
+labs(y="average number of steps") +
+labs(x="time of day") 
 ```
 
 ![](PA1_template_files/figure-html/weekend_difference-1.png) 
+This graph shows that during a weekday, activities peak during the morning, wheras during the weekend activity is more evenly distributed throughout the day
