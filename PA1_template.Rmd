@@ -16,7 +16,7 @@ summary(data)
 
 ## What is mean total number of steps taken per day?
 ``` {r mean_values}
-stepsByDay <-  na.omit(aggregate(data$steps, by=list(data$date),FUN=sum,na.rm=TRUE))
+stepsByDay <-  aggregate(data$steps, by=list(data$date),FUN=sum,na.rm=TRUE)
 hist(stepsByDay$x)
 mean(stepsByDay$x)
 median(stepsByDay$x)
@@ -25,14 +25,38 @@ median(stepsByDay$x)
 
 ## What is the average daily activity pattern?
 ``` {r average_daily}
-stepsByInterval <-  na.omit(aggregate(data$steps, by=list(data$interval),FUN=sum,na.rm=TRUE))
+stepsByInterval <-  aggregate(data$steps, by=list(data$interval),FUN=mean,na.rm=TRUE)
 times<-strptime(formatC(stepsByInterval$Group.1,width=4,format="d", flag="0"),'%H%M')
 plot(times,stepsByInterval$x, type='l')
 maxTime <- subset(stepsByInterval, stepsByInterval$x==max(stepsByInterval$x))
 format(strptime(formatC(maxTime$Group.1,width=4,format="d", flag="0"),'%H%M'),'%H:%M')
 ```
 ## Imputing missing values
+``` {r imputed_values}
+getMean <- function(tst) {
+  tst2=tst[3]
+  if (!is.nan(as.numeric(tst2))) 
+    tst[1] <- (stepsByInterval$x[as.numeric(tst2)==stepsByInterval$Group.1]);
+}
+imputed<-data
+imputedValues<- apply(imputed,1,function(x) getMean(x))
+imputed$imputedSteps <- imputedValues
+imputed <- transform(imputed,steps=ifelse(is.na(steps),imputedSteps,steps))
 
-
+stepsByDayImputed <-  aggregate(imputed$steps, by=list(imputed$date),FUN=sum,na.rm=TRUE)
+hist(stepsByDayImputed$x)
+mean(stepsByDayImputed$x)
+median(stepsByDayImputed$x)
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+``` {r weekend_difference}
+
+imputed$weekend <- factor(chron::is.weekend(imputed$date),labels=c("weekday","weekend"))
+groupSteps <- aggregate(imputed$steps, by =list(interval=imputed$interval,weekend=imputed$weekend),FUN=mean)
+library(ggplot2)
+g <- ggplot(groupSteps, aes(interval, x))
+g + geom_line() + facet_grid(weekend ~ .)
+
+
+```
