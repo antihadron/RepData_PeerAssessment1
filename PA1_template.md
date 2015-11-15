@@ -22,33 +22,47 @@ summary(data)
 ## What is mean total number of steps taken per day?
 
 ```r
-stepsByDay <-  aggregate(data$steps, by=list(data$date),FUN=sum)
+stepsByDay <-  na.omit(aggregate(data$steps, by=list(data$date),FUN=sum,na.rm=TRUE))
 hist(stepsByDay$x)
 ```
 
 ![](PA1_template_files/figure-html/mean_values-1.png) 
 
 ```r
-mean(na.omit(stepsByDay$x))
+mean(stepsByDay$x)
 ```
 
 ```
-## [1] 10766.19
+## [1] 9354.23
 ```
 
 ```r
-median(na.omit(stepsByDay$x))
+median(stepsByDay$x)
 ```
 
 ```
-## [1] 10765
+## [1] 10395
 ```
 
 
 ## What is the average daily activity pattern?
 
+```r
+stepsByInterval <-  na.omit(aggregate(data$steps, by=list(data$interval),FUN=sum,na.rm=TRUE))
+times<-strptime(formatC(stepsByInterval$Group.1,width=4,format="d", flag="0"),'%H%M')
+plot(times,stepsByInterval$x, type='l')
+```
 
+![](PA1_template_files/figure-html/average_daily-1.png) 
 
+```r
+maxTime <- subset(stepsByInterval, stepsByInterval$x==max(stepsByInterval$x))
+format(strptime(formatC(maxTime$Group.1,width=4,format="d", flag="0"),'%H%M'),'%H:%M')
+```
+
+```
+## [1] "08:35"
+```
 ## Imputing missing values
 
 
