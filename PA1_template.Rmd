@@ -9,8 +9,10 @@ output:
 
 
 ## Loading and preprocessing the data
-I am de loading of da data....
-
+``` {r load_data, echo="true"}
+data = read.csv('activity.csv')
+summary(data)
+```
 
 ## What is mean total number of steps taken per day?
 
